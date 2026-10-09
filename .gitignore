@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local SDK path
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Signing
+*.jks
+*.keystore
+
+# Kotlin
+.kotlin/
+
+*.log
+.DS_Store
+.claude/
