@@ -22,7 +22,7 @@ class TerminalApiTest {
     private lateinit var api: TerminalApi
 
     private val windowJson = """
-        {"id":1,"title":"rodolfo@OMEN:~","x":0,"y":0,"width":2560,"height":1394,
+        {"id":"3f2b9c1e-8a4d-4f6b-9c2e-1d7a5b8e4f01","process":"bash","title":"rodolfo@OMEN:~","x":0,"y":0,"width":2560,"height":1394,
          "moveMode":false,"focused":true,"minimized":false,"pid":42}
     """.trimIndent()
 
@@ -50,16 +50,16 @@ class TerminalApiTest {
         assertEquals("/windows", request.path)
         assertEquals("Bearer secret", request.getHeader("Authorization"))
         assertEquals(
-            listOf(TermWindow(1, "rodolfo@OMEN:~", 0, 0, 2560, 1394, moveMode = false, focused = true, minimized = false)),
+            listOf(TermWindow("3f2b9c1e-8a4d-4f6b-9c2e-1d7a5b8e4f01", "bash", "rodolfo@OMEN:~", 0, 0, 2560, 1394, moveMode = false, focused = true, minimized = false)),
             windows,
         )
     }
 
     @Test
     fun createWindowReturnsNewId() = runBlocking {
-        server.enqueue(MockResponse().setResponseCode(201).setBody("""{"id":7}"""))
+        server.enqueue(MockResponse().setResponseCode(201).setBody("""{"id":"9b1d4e7a-2c3f-4a5b-8d6e-0f1a2b3c4d5e"}"""))
 
-        assertEquals(7, api.createWindow())
+        assertEquals("9b1d4e7a-2c3f-4a5b-8d6e-0f1a2b3c4d5e", api.createWindow())
         val request = server.takeRequest()
         assertEquals("POST", request.method)
         assertEquals("/windows", request.path)
@@ -69,17 +69,17 @@ class TerminalApiTest {
     fun windowActionsHitTheRightEndpoints() = runBlocking {
         repeat(4) { server.enqueue(MockResponse().setBody("""{"ok":true}""")) }
 
-        api.setMoveMode(3, true)
-        api.resetPosition(3)
-        api.focus(3)
-        api.closeWindow(3)
+        api.setMoveMode("c0ffee00-1234-4abc-8def-0123456789ab", true)
+        api.resetPosition("c0ffee00-1234-4abc-8def-0123456789ab")
+        api.focus("c0ffee00-1234-4abc-8def-0123456789ab")
+        api.closeWindow("c0ffee00-1234-4abc-8def-0123456789ab")
 
         val move = server.takeRequest()
-        assertEquals("POST /windows/3/move-mode", "${move.method} ${move.path}")
+        assertEquals("POST /windows/c0ffee00-1234-4abc-8def-0123456789ab/move-mode", "${move.method} ${move.path}")
         assertTrue(JSONObject(move.body.readUtf8()).getBoolean("enabled"))
-        server.takeRequest().let { assertEquals("POST /windows/3/reset-position", "${it.method} ${it.path}") }
-        server.takeRequest().let { assertEquals("POST /windows/3/focus", "${it.method} ${it.path}") }
-        server.takeRequest().let { assertEquals("DELETE /windows/3", "${it.method} ${it.path}") }
+        server.takeRequest().let { assertEquals("POST /windows/c0ffee00-1234-4abc-8def-0123456789ab/reset-position", "${it.method} ${it.path}") }
+        server.takeRequest().let { assertEquals("POST /windows/c0ffee00-1234-4abc-8def-0123456789ab/focus", "${it.method} ${it.path}") }
+        server.takeRequest().let { assertEquals("DELETE /windows/c0ffee00-1234-4abc-8def-0123456789ab", "${it.method} ${it.path}") }
     }
 
     @Test
@@ -98,7 +98,7 @@ class TerminalApiTest {
     fun serverErrorMessageIsSurfaced() = runBlocking {
         server.enqueue(MockResponse().setResponseCode(404).setBody("""{"error":"no such window"}"""))
         try {
-            api.focus(99)
+            api.focus("c0ffee00-1234-4abc-8def-0123456789ab")
             fail("expected ApiException")
         } catch (e: ApiException) {
             assertEquals(404, e.code)
@@ -116,7 +116,7 @@ class TerminalApiTest {
 
         val windows = withTimeout(5_000) { api.events().first() }
 
-        assertEquals(1, windows.single().id)
+        assertEquals("3f2b9c1e-8a4d-4f6b-9c2e-1d7a5b8e4f01", windows.single().id)
         val request = server.takeRequest()
         assertEquals("/events", request.path)
         assertEquals("Bearer secret", request.getHeader("Authorization"))

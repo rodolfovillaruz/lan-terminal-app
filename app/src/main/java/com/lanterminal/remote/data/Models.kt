@@ -12,7 +12,9 @@ data class Connection(
 
 /** One terminal window, as returned by GET /windows and pushed on /events. */
 data class TermWindow(
-    val id: Int,
+    val id: String,
+    /** The command running in the foreground (bash, vim, ...); not unique. */
+    val process: String,
     val title: String,
     val x: Int,
     val y: Int,

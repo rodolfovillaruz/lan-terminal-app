@@ -25,7 +25,7 @@ class LiveDesktopTest {
 
         val address = url!!.removePrefix("http://").trimEnd('/')
         val api = TerminalApi(Connection(address.substringBefore(':'), address.substringAfter(':').toInt(), token!!))
-        var created: Int? = null
+        var created: String? = null
         try {
             val before = api.listWindows().map { it.id }.toSet()
             val id = api.createWindow().also { created = it }

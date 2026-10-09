@@ -62,10 +62,10 @@ fun WindowsScreen(
     onOpenSettings: () -> Unit,
     onRefresh: () -> Unit,
     onCreate: () -> Unit,
-    onMoveMode: (Int, Boolean) -> Unit,
-    onResetPosition: (Int) -> Unit,
-    onFocus: (Int) -> Unit,
-    onClose: (Int) -> Unit,
+    onMoveMode: (String, Boolean) -> Unit,
+    onResetPosition: (String) -> Unit,
+    onFocus: (String) -> Unit,
+    onClose: (String) -> Unit,
     onMessageShown: () -> Unit,
 ) {
     val snackbar = remember { SnackbarHostState() }
@@ -145,7 +145,7 @@ fun WindowsScreen(
     confirmClose?.let { window ->
         AlertDialog(
             onDismissRequest = { confirmClose = null },
-            title = { Text("Close Terminal ${window.id}?") },
+            title = { Text("Close ${window.process}?") },
             text = { Text("The window closes and its shell, plus anything running in it, is ended.") },
             confirmButton = {
                 TextButton(onClick = {
@@ -227,7 +227,7 @@ private fun WindowCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Terminal ${window.id}",
+                        window.process,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                     )

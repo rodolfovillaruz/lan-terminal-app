@@ -33,7 +33,7 @@ data class UiState(
     val status: LinkStatus = LinkStatus.NotConfigured,
     val windows: List<TermWindow> = emptyList(),
     /** Window ids with a request in flight, so their buttons can be disabled. */
-    val busy: Set<Int> = emptySet(),
+    val busy: Set<String> = emptySet(),
     val creating: Boolean = false,
     val refreshing: Boolean = false,
     /** One-shot message for the snackbar. */
@@ -127,8 +127,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             _state.update { it.copy(creating = true) }
             try {
-                val id = api.createWindow()
-                showMessage("Opened Terminal $id")
+                api.createWindow()
+                showMessage("Opened a terminal")
                 syncIfNotLive(api)
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
@@ -139,15 +139,19 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun setMoveMode(id: Int, enabled: Boolean) = act(id) { setMoveMode(id, enabled) }
+    fun setMoveMode(id: String, enabled: Boolean) = act(id) { setMoveMode(id, enabled) }
 
-    fun resetPosition(id: Int) = act(id, "Terminal $id moved to 0,0") { resetPosition(id) }
+    fun resetPosition(id: String) = act(id, "${labelOf(id)} moved to 0,0") { resetPosition(id) }
 
-    fun focus(id: Int) = act(id) { focus(id) }
+    fun focus(id: String) = act(id) { focus(id) }
 
-    fun closeWindow(id: Int) = act(id, "Closed Terminal $id") { closeWindow(id) }
+    fun closeWindow(id: String) = act(id, "Closed ${labelOf(id)}") { closeWindow(id) }
 
-    private fun act(id: Int, success: String? = null, block: suspend TerminalApi.() -> Unit) {
+    /** Ids are UUIDs, so messages name the window by its process instead. */
+    private fun labelOf(id: String): String =
+        _state.value.windows.find { it.id == id }?.process ?: "terminal"
+
+    private fun act(id: String, success: String? = null, block: suspend TerminalApi.() -> Unit) {
         val api = api ?: return
         viewModelScope.launch {
             _state.update { it.copy(busy = it.busy + id) }

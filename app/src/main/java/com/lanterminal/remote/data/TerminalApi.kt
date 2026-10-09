@@ -27,22 +27,22 @@ class TerminalApi(private val connection: Connection) {
     suspend fun listWindows(): List<TermWindow> =
         call(request("/windows").get().build()) { parseWindows(JSONArray(it)) }
 
-    suspend fun createWindow(): Int =
-        call(post("/windows")) { JSONObject(it).getInt("id") }
+    suspend fun createWindow(): String =
+        call(post("/windows")) { JSONObject(it).getString("id") }
 
-    suspend fun setMoveMode(id: Int, enabled: Boolean) {
+    suspend fun setMoveMode(id: String, enabled: Boolean) {
         call(post("/windows/$id/move-mode", JSONObject().put("enabled", enabled))) {}
     }
 
-    suspend fun resetPosition(id: Int) {
+    suspend fun resetPosition(id: String) {
         call(post("/windows/$id/reset-position")) {}
     }
 
-    suspend fun focus(id: Int) {
+    suspend fun focus(id: String) {
         call(post("/windows/$id/focus")) {}
     }
 
-    suspend fun closeWindow(id: Int) {
+    suspend fun closeWindow(id: String) {
         call(request("/windows/$id").delete().build()) {}
     }
 
@@ -111,9 +111,12 @@ class TerminalApi(private val connection: Connection) {
 
         fun parseWindows(array: JSONArray): List<TermWindow> = (0 until array.length()).map { i ->
             val o = array.getJSONObject(i)
+            val title = o.optString("title")
             TermWindow(
-                id = o.getInt("id"),
-                title = o.optString("title"),
+                id = o.getString("id"),
+                // Older desktop builds don't send process; their title is the closest thing.
+                process = o.optString("process", title),
+                title = title,
                 x = o.optInt("x"),
                 y = o.optInt("y"),
                 width = o.optInt("width"),
