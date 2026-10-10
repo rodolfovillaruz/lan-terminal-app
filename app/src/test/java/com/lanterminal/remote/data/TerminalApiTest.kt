@@ -23,7 +23,7 @@ class TerminalApiTest {
 
     private val windowJson = """
         {"id":"3f2b9c1e-8a4d-4f6b-9c2e-1d7a5b8e4f01","process":"bash","title":"rodolfo@OMEN:~","x":0,"y":0,"width":2560,"height":1394,
-         "moveMode":false,"focused":true,"minimized":false,"pid":42}
+         "moveMode":false,"alwaysOnTop":true,"focused":true,"minimized":false,"pid":42}
     """.trimIndent()
 
     @Before
@@ -50,7 +50,7 @@ class TerminalApiTest {
         assertEquals("/windows", request.path)
         assertEquals("Bearer secret", request.getHeader("Authorization"))
         assertEquals(
-            listOf(TermWindow("3f2b9c1e-8a4d-4f6b-9c2e-1d7a5b8e4f01", "bash", "rodolfo@OMEN:~", 0, 0, 2560, 1394, moveMode = false, focused = true, minimized = false)),
+            listOf(TermWindow("3f2b9c1e-8a4d-4f6b-9c2e-1d7a5b8e4f01", "bash", "rodolfo@OMEN:~", 0, 0, 2560, 1394, moveMode = false, alwaysOnTop = true, focused = true, minimized = false)),
             windows,
         )
     }
@@ -67,9 +67,10 @@ class TerminalApiTest {
 
     @Test
     fun windowActionsHitTheRightEndpoints() = runBlocking {
-        repeat(4) { server.enqueue(MockResponse().setBody("""{"ok":true}""")) }
+        repeat(5) { server.enqueue(MockResponse().setBody("""{"ok":true}""")) }
 
         api.setMoveMode("c0ffee00-1234-4abc-8def-0123456789ab", true)
+        api.setAlwaysOnTop("c0ffee00-1234-4abc-8def-0123456789ab", false)
         api.resetPosition("c0ffee00-1234-4abc-8def-0123456789ab")
         api.focus("c0ffee00-1234-4abc-8def-0123456789ab")
         api.closeWindow("c0ffee00-1234-4abc-8def-0123456789ab")
@@ -77,6 +78,9 @@ class TerminalApiTest {
         val move = server.takeRequest()
         assertEquals("POST /windows/c0ffee00-1234-4abc-8def-0123456789ab/move-mode", "${move.method} ${move.path}")
         assertTrue(JSONObject(move.body.readUtf8()).getBoolean("enabled"))
+        val onTop = server.takeRequest()
+        assertEquals("POST /windows/c0ffee00-1234-4abc-8def-0123456789ab/always-on-top", "${onTop.method} ${onTop.path}")
+        assertFalse(JSONObject(onTop.body.readUtf8()).getBoolean("enabled"))
         server.takeRequest().let { assertEquals("POST /windows/c0ffee00-1234-4abc-8def-0123456789ab/reset-position", "${it.method} ${it.path}") }
         server.takeRequest().let { assertEquals("POST /windows/c0ffee00-1234-4abc-8def-0123456789ab/focus", "${it.method} ${it.path}") }
         server.takeRequest().let { assertEquals("DELETE /windows/c0ffee00-1234-4abc-8def-0123456789ab", "${it.method} ${it.path}") }

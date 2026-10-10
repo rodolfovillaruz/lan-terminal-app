@@ -5,6 +5,7 @@ Android remote for the [LAN Terminal](../browser-ssh-client-electron) desktop ap
 - see every terminal window that's open on the desktop, updated live
 - open a new terminal window
 - turn **move mode** on or off for a window, so it can be dragged with the mouse
+- keep a window **always on top**, covering the taskbar and hidden from it
 - move a window back to **x=0, y=0**
 - bring a window to the front
 - close a window, after a confirmation

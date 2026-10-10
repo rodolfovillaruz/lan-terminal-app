@@ -21,6 +21,8 @@ data class TermWindow(
     val width: Int,
     val height: Int,
     val moveMode: Boolean,
+    /** Kept above the taskbar and left out of it and Alt+Tab. */
+    val alwaysOnTop: Boolean,
     val focused: Boolean,
     val minimized: Boolean,
 )

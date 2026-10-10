@@ -141,6 +141,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setMoveMode(id: String, enabled: Boolean) = act(id) { setMoveMode(id, enabled) }
 
+    fun setAlwaysOnTop(id: String, enabled: Boolean) = act(id) { setAlwaysOnTop(id, enabled) }
+
     fun resetPosition(id: String) = act(id, "${labelOf(id)} moved to 0,0") { resetPosition(id) }
 
     fun focus(id: String) = act(id) { focus(id) }

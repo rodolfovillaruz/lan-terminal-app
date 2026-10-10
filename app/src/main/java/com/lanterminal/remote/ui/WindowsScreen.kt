@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.OpenWith
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.VerticalAlignTop
@@ -63,6 +64,7 @@ fun WindowsScreen(
     onRefresh: () -> Unit,
     onCreate: () -> Unit,
     onMoveMode: (String, Boolean) -> Unit,
+    onAlwaysOnTop: (String, Boolean) -> Unit,
     onResetPosition: (String) -> Unit,
     onFocus: (String) -> Unit,
     onClose: (String) -> Unit,
@@ -133,6 +135,7 @@ fun WindowsScreen(
                         window = window,
                         busy = window.id in state.busy,
                         onMoveMode = { onMoveMode(window.id, it) },
+                        onAlwaysOnTop = { onAlwaysOnTop(window.id, it) },
                         onResetPosition = { onResetPosition(window.id) },
                         onFocus = { onFocus(window.id) },
                         onClose = { confirmClose = window },
@@ -212,6 +215,7 @@ private fun WindowCard(
     window: TermWindow,
     busy: Boolean,
     onMoveMode: (Boolean) -> Unit,
+    onAlwaysOnTop: (Boolean) -> Unit,
     onResetPosition: () -> Unit,
     onFocus: () -> Unit,
     onClose: () -> Unit,
@@ -254,6 +258,7 @@ private fun WindowCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                if (window.alwaysOnTop) Badge("On top")
                 if (window.focused) Badge("Focused")
                 if (window.minimized) Badge("Minimized")
             }
@@ -271,6 +276,21 @@ private fun WindowCard(
                     )
                 }
                 Switch(checked = window.moveMode, onCheckedChange = onMoveMode, enabled = !busy)
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.PushPin, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Always on top", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        if (window.alwaysOnTop) "Covers the taskbar; hidden from the taskbar and Alt+Tab"
+                        else "Keeps the window above the taskbar",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(checked = window.alwaysOnTop, onCheckedChange = onAlwaysOnTop, enabled = !busy)
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

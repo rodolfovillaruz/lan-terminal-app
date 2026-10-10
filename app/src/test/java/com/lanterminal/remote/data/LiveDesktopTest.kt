@@ -40,6 +40,11 @@ class LiveDesktopTest {
             api.setMoveMode(id, false)
             assertFalse(api.listWindows().single { it.id == id }.moveMode)
 
+            api.setAlwaysOnTop(id, true)
+            assertTrue(api.listWindows().single { it.id == id }.alwaysOnTop)
+            api.setAlwaysOnTop(id, false)
+            assertFalse(api.listWindows().single { it.id == id }.alwaysOnTop)
+
             // The window manager applies the move asynchronously. Run with the screen unlocked:
             // KWin does not place windows normally while the lock screen is up.
             api.resetPosition(id)
