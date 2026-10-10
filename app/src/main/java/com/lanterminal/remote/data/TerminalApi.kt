@@ -34,6 +34,10 @@ class TerminalApi(private val connection: Connection) {
         call(post("/windows/$id/move-mode", JSONObject().put("enabled", enabled))) {}
     }
 
+    suspend fun setFullscreen(id: String, enabled: Boolean) {
+        call(post("/windows/$id/fullscreen", JSONObject().put("enabled", enabled))) {}
+    }
+
     suspend fun resetPosition(id: String) {
         call(post("/windows/$id/reset-position")) {}
     }
@@ -122,6 +126,7 @@ class TerminalApi(private val connection: Connection) {
                 width = o.optInt("width"),
                 height = o.optInt("height"),
                 moveMode = o.optBoolean("moveMode"),
+                fullscreen = o.optBoolean("fullscreen"),
                 focused = o.optBoolean("focused"),
                 minimized = o.optBoolean("minimized"),
             )

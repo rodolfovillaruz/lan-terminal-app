@@ -21,6 +21,7 @@ data class TermWindow(
     val width: Int,
     val height: Int,
     val moveMode: Boolean,
+    val fullscreen: Boolean,
     val focused: Boolean,
     val minimized: Boolean,
 )

@@ -70,6 +70,7 @@ private fun App(vm: MainViewModel = viewModel()) {
             onRefresh = vm::refresh,
             onCreate = vm::createWindow,
             onMoveMode = vm::setMoveMode,
+            onFullscreen = vm::setFullscreen,
             onResetPosition = vm::resetPosition,
             onFocus = vm::focus,
             onClose = vm::closeWindow,

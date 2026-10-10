@@ -40,6 +40,16 @@ class LiveDesktopTest {
             api.setMoveMode(id, false)
             assertFalse(api.listWindows().single { it.id == id }.moveMode)
 
+            // Fullscreen is applied by the window manager, so wait for the window to report it.
+            suspend fun awaitFullscreen(expected: Boolean) = withTimeoutOrNull(2_000) {
+                while (api.listWindows().single { it.id == id }.fullscreen != expected) delay(100)
+                true
+            } == true
+            api.setFullscreen(id, true)
+            assertTrue("window did not go fullscreen", awaitFullscreen(true))
+            api.setFullscreen(id, false)
+            assertTrue("window did not leave fullscreen", awaitFullscreen(false))
+
             // The window manager applies the move asynchronously. Run with the screen unlocked:
             // KWin does not place windows normally while the lock screen is up.
             api.resetPosition(id)

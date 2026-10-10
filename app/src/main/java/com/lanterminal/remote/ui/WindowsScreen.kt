@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.OpenWith
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Terminal
@@ -63,6 +64,7 @@ fun WindowsScreen(
     onRefresh: () -> Unit,
     onCreate: () -> Unit,
     onMoveMode: (String, Boolean) -> Unit,
+    onFullscreen: (String, Boolean) -> Unit,
     onResetPosition: (String) -> Unit,
     onFocus: (String) -> Unit,
     onClose: (String) -> Unit,
@@ -133,6 +135,7 @@ fun WindowsScreen(
                         window = window,
                         busy = window.id in state.busy,
                         onMoveMode = { onMoveMode(window.id, it) },
+                        onFullscreen = { onFullscreen(window.id, it) },
                         onResetPosition = { onResetPosition(window.id) },
                         onFocus = { onFocus(window.id) },
                         onClose = { confirmClose = window },
@@ -212,6 +215,7 @@ private fun WindowCard(
     window: TermWindow,
     busy: Boolean,
     onMoveMode: (Boolean) -> Unit,
+    onFullscreen: (Boolean) -> Unit,
     onResetPosition: () -> Unit,
     onFocus: () -> Unit,
     onClose: () -> Unit,
@@ -271,6 +275,21 @@ private fun WindowCard(
                     )
                 }
                 Switch(checked = window.moveMode, onCheckedChange = onMoveMode, enabled = !busy)
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Fullscreen, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Fullscreen", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        if (window.fullscreen) "Turn off to restore the previous size and position"
+                        else "Covers the whole screen, panel included",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(checked = window.fullscreen, onCheckedChange = onFullscreen, enabled = !busy)
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

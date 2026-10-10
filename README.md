@@ -5,6 +5,7 @@ Android remote for the [LAN Terminal](../browser-ssh-client-electron) desktop ap
 - see every terminal window that's open on the desktop, updated live
 - open a new terminal window
 - turn **move mode** on or off for a window, so it can be dragged with the mouse
+- turn **fullscreen** on or off for a window
 - move a window back to **x=0, y=0**
 - bring a window to the front
 - close a window, after a confirmation
@@ -41,7 +42,7 @@ You need JDK 21 and the Android SDK (compileSdk 37).
 ```
 
 - `TerminalApiTest` checks the API client against OkHttp's MockWebServer. It covers the endpoints, the auth header, error handling and WebSocket pushes.
-- `LiveDesktopTest` goes through a full window lifecycle against a real running desktop app: create, live update, move mode, reset to 0,0, focus, close, and rejection of a wrong token. It's skipped unless you point it at a desktop app:
+- `LiveDesktopTest` goes through a full window lifecycle against a real running desktop app: create, live update, move mode, fullscreen, reset to 0,0, focus, close, and rejection of a wrong token. It's skipped unless you point it at a desktop app:
 
   ```sh
   LAN_TERMINAL_URL=http://127.0.0.1:8765 \
